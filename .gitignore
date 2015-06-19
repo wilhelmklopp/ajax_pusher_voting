@@ -1,0 +1,8 @@
+venv
+*.pyc
+staticfiles
+.env
+*.sublime-project
+*.sqlite3
+*.sublime-workspace
+migrations

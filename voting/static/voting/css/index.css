@@ -1,0 +1,32 @@
+p {
+	font-family: "Arial", Helvetica, sans-serif;
+}
+
+.voteud {
+	width: 0; 
+	height: 0; 
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	cursor: hand;
+}
+.vote-up {
+	border-bottom: 20px solid #7B7B7B;
+}
+.vote-up-selected {
+	border-bottom: 20px solid #D5992B;
+}
+.vote-down {
+	border-top: 20px solid #7B7B7B;
+}
+.vote-down-selected {
+	border-top: 20px solid #D5992B;
+}
+
+.votingbox {
+	padding: 10px;
+	max-width: 40px;
+}
+.score {
+	text-align: center;
+	padding: 5px;
+}

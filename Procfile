@@ -1,0 +1,1 @@
+web: gunicorn pubsub.wsgi --log-file -

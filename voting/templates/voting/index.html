@@ -1,0 +1,139 @@
+{% load staticfiles %}
+{% csrf_token %}
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!--<link href="{% static 'voting/css/index.css' %}" rel="stylesheet">--><!-- used with static files-->
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <style>
+        	p {
+				font-family: "Arial", Helvetica, sans-serif;
+			}
+
+			.voteud {
+				width: 0; 
+				height: 0; 
+				border-left: 20px solid transparent;
+				border-right: 20px solid transparent;
+				cursor: hand;
+			}
+			.vote-up {
+				border-bottom: 20px solid #7B7B7B;
+			}
+			.vote-up-selected {
+				border-bottom: 20px solid #D5992B;
+			}
+			.vote-down {
+				border-top: 20px solid #7B7B7B;
+			}
+			.vote-down-selected {
+				border-top: 20px solid #D5992B;
+			}
+
+			.votingbox {
+				padding: 10px;
+				max-width: 40px;
+			}
+			.score {
+				text-align: center;
+				padding: 5px;
+			}
+
+		</style>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <p>Demonstration of PubSub voting with Pusher and AJAX</p>
+        <div class="votingbox">
+	        <div class="vote-up voteud" onclick="voteup()"></div>
+	        <div class="score" id="voting-score">{{score}}</div>
+	        <div class="vote-down voteud" onclick="votedown()"></div>
+        </div>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script>
+        	function setCookie(cname, value) {
+        		document.cookie = cname + "=" + value + "; path/";
+        	}
+        	function getCookie(cname) { //function from w3
+			    var name = cname + "=";
+			    var ca = document.cookie.split(';');
+			    for(var i=0; i<ca.length; i++) {
+			        var c = ca[i];
+			        while (c.charAt(0)==' ') c = c.substring(1);
+			        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+			    }
+			    return false;
+			}
+        	function ajax_get(vote) {
+        		$.get("rv/", {vote: vote});
+        	}
+        	score = document.getElementById("voting-score").innerHTML;
+        	function voteup() {
+        		if  (!$(".vote-up").hasClass("vote-up-selected")) {
+        			ajax_get("up");
+        			setCookie("voted", "up");
+        		}
+        		else {
+        			ajax_get("down");
+        			setCookie("voted", "false");
+        		}
+        		$(".vote-up").toggleClass("vote-up-selected");
+        		if ($(".vote-down").hasClass("vote-down-selected")) {
+        			$(".vote-down").removeClass("vote-down-selected");
+        			ajax_get("up");
+        		}
+        	}
+        	function votedown() {
+        		if (!$(".vote-down").hasClass("vote-down-selected")) {
+        			ajax_get("down");
+        			setCookie("voted", "down");
+        		}
+        		else {
+        			ajax_get("up");
+        			setCookie("voted", "false");
+        		}
+        		$(".vote-down").toggleClass("vote-down-selected");
+        		if ($(".vote-up").hasClass("vote-up-selected")) {
+        			$(".vote-up").removeClass("vote-up-selected");
+        			ajax_get("down");
+        			
+        		}
+        	}
+        	function init_selections() {
+        		if (!getCookie("voted")) {
+        			setCookie("voted", "false");
+        		}
+        		else if (getCookie("voted") == "up") {
+        			$(".vote-up").addClass("vote-up-selected");
+        		}
+        		else if (getCookie("voted") == "down") {
+        			$(".vote-down").addClass("vote-down-selected");
+        		}
+
+        	}
+        	init_selections();
+        </script>
+        <script src="https://js.pusher.com/2.2/pusher.min.js"></script>
+        <script>
+        	var pusher = new Pusher("ca2bcf928a3d000ae5e4");
+        	var channel = pusher.subscribe("voting_channel");
+        	channel.bind("new_vote", function(data) {
+        		document.getElementById("voting-score").innerHTML = data["score"];
+        	});
+        </script>
+    </body>
+</html>
